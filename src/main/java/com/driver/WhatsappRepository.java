@@ -89,13 +89,21 @@ public class WhatsappRepository {
         }
 
         if(!groupUserMap.get(group).contains(sender)){
-            throw  new Exception("You are not allowed to send message");
+            throw new Exception("You are not allowed to send message");
         }
-        List<Message> temp = groupMessageMap.get(group);
-        temp.add(message);
-        groupMessageMap.put(group,temp);
-        senderMap.put(message,sender);
-
+        if(groupMessageMap.containsKey(group)){
+            List<Message> temp = groupMessageMap.get(group);
+            temp.add(message);
+            groupMessageMap.put(group,temp);
+            senderMap.put(message,sender);
+        }
+       else{
+            List<Message> temp = new ArrayList<>();
+            temp.add(message);
+            groupMessageMap.put(group,temp);
+            senderMap.put(message,sender);
+        }
+        messageId++;
         return groupMessageMap.get(group).size();
     }
 
@@ -122,35 +130,35 @@ public class WhatsappRepository {
         return "SUCCESS";
     }
 
-    public int removeUser(User user) throws Exception{
-        //This is a bonus problem and does not contains any marks
-        //A user belongs to exactly one group
-        //If user is not found in any group, throw "User not found" exception
-        //If user is found in a group and it is the admin, throw "Cannot remove admin" exception
-        //If user is not the admin, remove the user from the group, remove all its messages from all the databases, and update relevant attributes accordingly.
-        //If user is removed successfully, return (the updated number of users in the group + the updated number of messages in group + the updated number of overall messages)
-
-        for(Group g : groupUserMap.keySet()){
-            if(groupUserMap.get(g).contains(user)){
-
-                if(adminMap.get(g) == user){
-                    throw new Exception("Cannot remove admin");
-                }
-
-                groupUserMap.get(g).remove(user);
-
-                for(Message m : senderMap.keySet()){
-                    if(senderMap.get(m) == user){
-                        groupMessageMap.get(g).remove(m);
-                        senderMap.remove(m);
-                        listMessage.remove(m);
-                    }
-                }
-                return groupUserMap.get(g).size() + groupMessageMap.get(g).size() +  senderMap.size();
-            }
-        }
-        throw new Exception("User not found");
-    }
+//    public int removeUser(User user) throws Exception{
+//        //This is a bonus problem and does not contains any marks
+//        //A user belongs to exactly one group
+//        //If user is not found in any group, throw "User not found" exception
+//        //If user is found in a group and it is the admin, throw "Cannot remove admin" exception
+//        //If user is not the admin, remove the user from the group, remove all its messages from all the databases, and update relevant attributes accordingly.
+//        //If user is removed successfully, return (the updated number of users in the group + the updated number of messages in group + the updated number of overall messages)
+//
+//        for(Group g : groupUserMap.keySet()){
+//            if(groupUserMap.get(g).contains(user)){
+//
+//                if(adminMap.get(g) == user){
+//                    throw new Exception("Cannot remove admin");
+//                }
+//
+//                groupUserMap.get(g).remove(user);
+//
+//                for(Message m : senderMap.keySet()){
+//                    if(senderMap.get(m) == user){
+//                        groupMessageMap.get(g).remove(m);
+//                        senderMap.remove(m);
+//                        listMessage.remove(m);
+//                    }
+//                }
+//                return groupUserMap.get(g).size() + groupMessageMap.get(g).size() +  senderMap.size();
+//            }
+//        }
+//        throw new Exception("User not found");
+//    }
 
 //    public String findMessage(Date start, Date end, int K) throws Exception{
 //        //This is a bonus problem and does not contains any marks
