@@ -73,10 +73,11 @@ public class WhatsappRepository {
         // The 'i^th' created message has message id 'i'.
         // Return the message id.
 
+        messageId++;
         Message m = new Message(messageId,content);
         listMessage.add(m);
 
-        return messageId++;
+        return messageId;
     }
 
     public int sendMessage(Message message, User sender, Group group) throws Exception{
@@ -84,26 +85,35 @@ public class WhatsappRepository {
         //Throw "You are not allowed to send message" if the sender is not a member of the group
         //If the message is sent successfully, return the final number of messages in that group.
 
-        if(!adminMap.containsKey(group)){
+        if(!groupUserMap.containsKey(group)){
             throw new Exception("Group does not exist");
         }
 
-        if(!groupUserMap.get(group).contains(sender)){
+        boolean flag = false;
+        for(User u : groupUserMap.get(group)){
+            if(u.equals(sender)){
+                flag = true;
+                break;
+            }
+        }
+        if(flag) {
+            if (groupMessageMap.containsKey(group)) {
+                List<Message> temp = groupMessageMap.get(group);
+                temp.add(message);
+                groupMessageMap.put(group, temp);
+                senderMap.put(message, sender);
+            } else {
+                List<Message> temp = new ArrayList<>();
+                temp.add(message);
+                groupMessageMap.put(group, temp);
+                senderMap.put(message, sender);
+            }
+            messageId++;
+        }
+        else{
             throw new Exception("You are not allowed to send message");
         }
-        if(groupMessageMap.containsKey(group)){
-            List<Message> temp = groupMessageMap.get(group);
-            temp.add(message);
-            groupMessageMap.put(group,temp);
-            senderMap.put(message,sender);
-        }
-       else{
-            List<Message> temp = new ArrayList<>();
-            temp.add(message);
-            groupMessageMap.put(group,temp);
-            senderMap.put(message,sender);
-        }
-        messageId++;
+
         return groupMessageMap.get(group).size();
     }
 
